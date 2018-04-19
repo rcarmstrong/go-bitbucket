@@ -4,15 +4,16 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"golang.org/x/net/context"
-	"golang.org/x/oauth2"
-	"golang.org/x/oauth2/bitbucket"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"net/url"
 	"strconv"
 	"strings"
+
+	"golang.org/x/net/context"
+	"golang.org/x/oauth2"
+	"golang.org/x/oauth2/bitbucket"
 )
 
 type Client struct {
@@ -124,6 +125,10 @@ func (c *Client) execute(method string, urlStr string, text string) (interface{}
 	}
 	if resp.Body != nil {
 		defer resp.Body.Close()
+	}
+
+	if resp.StatusCode == http.StatusNoContent {
+		return nil, nil
 	}
 
 	if (resp.StatusCode != http.StatusOK) && (resp.StatusCode != http.StatusCreated) {
