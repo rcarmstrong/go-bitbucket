@@ -2,6 +2,7 @@ package bitbucket
 
 import (
 	"encoding/json"
+	"net/http"
 	"os"
 
 	"github.com/k0kubun/pp"
@@ -60,6 +61,30 @@ func (r *Repository) ListWatchers(ro *RepositoryOptions) (interface{}, error) {
 func (r *Repository) ListForks(ro *RepositoryOptions) (interface{}, error) {
 	urlStr := r.c.requestUrl("/repositories/%s/%s/forks", ro.Owner, ro.Repo_slug)
 	return r.c.execute("GET", urlStr, "")
+}
+
+// AddDefaultReviewer will add the given user to the default-reviewers list. The RepositoryOptions for the Owner
+// and the Repo_slug are used. The username is not validated. Review for spelling mistakes.
+func (r *Repository) AddDefaultReviewer(ro *RepositoryOptions, username string) (bool, error) {
+	urlStr := r.c.requestUrl("/repositories/%s/%s/default-reviewers/%s", ro.Owner, ro.Repo_slug, username)
+	_, err := r.c.execute(http.MethodPut, urlStr, "")
+	if err != nil {
+		return false, err
+	}
+
+	return true, nil
+}
+
+// RemoveDefaultReviewer will take the given user out of the default-reviewers list. The RepositoryOptions for the Owner
+// and the Repo_slug are used. The username is not validated. Review for spelling mistakes.
+func (r *Repository) RemoveDefaultReviewer(ro *RepositoryOptions, username string) (bool, error) {
+	urlStr := r.c.requestUrl("/repositories/%s/%s/default-reviewers/%s", ro.Owner, ro.Repo_slug, username)
+	_, err := r.c.execute(http.MethodDelete, urlStr, "")
+	if err != nil {
+		return false, err
+	}
+
+	return true, nil
 }
 
 func (r *Repository) buildRepositoryBody(ro *RepositoryOptions) string {
