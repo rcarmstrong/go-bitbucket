@@ -62,6 +62,16 @@ func (r *Repository) ListForks(ro *RepositoryOptions) (interface{}, error) {
 	return r.c.execute("GET", urlStr, "")
 }
 
+func (r *Repository) AddDefaultReviewer(ro *RepositoryOptions, username string) (bool, error) {
+	urlStr := r.c.requestUrl("/repositories/%s/%s/default-reviewers/%s", ro.Owner, ro.Repo_slug, username)
+	_, err := r.c.execute("PUT", urlStr, "")
+	if err != nil {
+		return false, err
+	}
+
+	return true, nil
+}
+
 func (r *Repository) buildRepositoryBody(ro *RepositoryOptions) string {
 
 	body := map[string]interface{}{}
