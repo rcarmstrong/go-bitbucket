@@ -33,3 +33,21 @@ func (t *Teams) Repositories(teamname string) (interface{}, error) {
 	urlStr := t.c.requestUrl("/teams/%s/repositories", teamname)
 	return t.c.execute("GET", urlStr, "")
 }
+
+// Projects returns a list of project names for the given team.
+func (t *Teams) Projects(teamname string) ([]string, error) {
+	urlStr := t.c.requestUrl("/teams/%s/repositories", teamname)
+	response, err := t.c.execute("GET", urlStr, "")
+	if err != nil {
+		return nil, err
+	}
+
+	list := response.(map[string]interface{})["values"].([]interface{})
+	projects := make([]string, len(list))
+
+	for i, l := range list {
+		projects[i] = l.(map[string]interface{})["name"].(string)
+	}
+
+	return projects, nil
+}
