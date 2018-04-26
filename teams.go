@@ -36,7 +36,7 @@ func (t *Teams) Repositories(teamname string) (interface{}, error) {
 
 // Projects returns a list of project names for the given team.
 func (t *Teams) Projects(teamname string) ([]string, error) {
-	urlStr := t.c.requestUrl("/teams/%s/repositories", teamname)
+	urlStr := t.c.requestUrl("/teams/%s/projects", teamname)
 	response, err := t.c.execute("GET", urlStr, "")
 	if err != nil {
 		return nil, err
