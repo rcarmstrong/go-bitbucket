@@ -34,8 +34,14 @@ func (t *Teams) Repositories(teamname string) (interface{}, error) {
 	return t.c.execute("GET", urlStr, "")
 }
 
-// Projects returns a list of project names for the given team.
-func (t *Teams) Projects(teamname string) ([]string, error) {
+// Projects returns a list of project objects for the given team.
+func (t *Teams) Projects(teamname string) (interface{}, error) {
+	urlStr := t.c.requestUrl("/teams/%s/projects/", teamname)
+	return t.c.execute("GET", urlStr, "")
+}
+
+// ProjectNames returns a list of project names for the given team.
+func (t *Teams) ProjectNames(teamname string) ([]string, error) {
 	urlStr := t.c.requestUrl("/teams/%s/projects/", teamname)
 	response, err := t.c.execute("GET", urlStr, "")
 	if err != nil {
