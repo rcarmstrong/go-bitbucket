@@ -63,6 +63,12 @@ func (r *Repository) ListForks(ro *RepositoryOptions) (interface{}, error) {
 	return r.c.execute("GET", urlStr, "")
 }
 
+// ListDefaultReviewers returns the list of default reviewers for the given repo
+func (r *Repository) ListDefaultReviewers(ro *RepositoryOptions) (interface{}, error) {
+	urlStr := r.c.requestUrl("/repositories/%s/%s/default-reviewers", ro.Owner, ro.Repo_slug)
+	return r.c.execute(http.MethodGet, urlStr, "")
+}
+
 // AddDefaultReviewer will add the given user to the default-reviewers list. The RepositoryOptions for the Owner
 // and the Repo_slug are used. The username is not validated. Review for spelling mistakes.
 func (r *Repository) AddDefaultReviewer(ro *RepositoryOptions, username string) error {
