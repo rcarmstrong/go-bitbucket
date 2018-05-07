@@ -90,6 +90,7 @@ type teams interface {
 	Repositories(teamname string) (interface{}, error)
 	Projects(teamname string) (interface{}, error)
 	ProjectNames(teamname string) ([]string, error)
+	ProjectInfo(teamname, projectKey string) (interface{}, error)
 }
 
 type RepositoriesOptions struct {
@@ -110,6 +111,13 @@ type RepositoryOptions struct {
 	Has_issues  string `json:"has_issues"`
 	Has_wiki    string `json:"has_wiki"`
 	Project     string `json:"project"`
+}
+
+type ProjectRepositoryOptions struct {
+	Owner      string `json:"owner"`
+	Project    string `json:"project"`
+	Page       int
+	PageLength int
 }
 
 type PullRequestsOptions struct {

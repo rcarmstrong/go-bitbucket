@@ -57,3 +57,9 @@ func (t *Teams) ProjectNames(teamname string) ([]string, error) {
 
 	return projects, nil
 }
+
+// ProjectInfo return information on a specific project
+func (t *Teams) ProjectInfo(teamname, projectKey string) (interface{}, error) {
+	urlStr := t.c.requestUrl("/teams/%s/projects/%s", teamname, projectKey)
+	return t.c.execute("GET", urlStr, "")
+}
