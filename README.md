@@ -1,13 +1,13 @@
 # go-bitbucket
 
-<a class="repo-badge" href="https://godoc.org/github.com/ktrysmt/go-bitbucket"><img src="https://godoc.org/github.com/ktrysmt/go-bitbucket?status.svg" alt="go-bitbucket?status"></a>
-<a href="https://goreportcard.com/report/github.com/ktrysmt/go-bitbucket"><img class="badge" tag="github.com/ktrysmt/go-bitbucket" src="https://goreportcard.com/badge/github.com/ktrysmt/go-bitbucket"></a>
+<a class="repo-badge" href="https://godoc.org/github.com/rcarmstrong/go-bitbucket"><img src="https://godoc.org/github.com/rcarmstrong/go-bitbucket?status.svg" alt="go-bitbucket?status"></a>
+<a href="https://goreportcard.com/report/github.com/rcarmstrong/go-bitbucket"><img class="badge" tag="github.com/rcarmstrong/go-bitbucket" src="https://goreportcard.com/badge/github.com/rcarmstrong/go-bitbucket"></a>
 
 > Bitbucket-API library for golang.
 
-Support Bitbucket API v2.0. 
+Extention of go-bitbucket by [ktrysmt](https://github.com/ktrysmt)
 
-And the response type is json format defined Bitbucket API.
+Supports Bitbucket API v2.0 with the response type being of json format defined by the Bitbucket API.
 
 - Bitbucket API v2.0 <https://developer.atlassian.com/bitbucket/api/2/reference/>
 - Swagger for API v2.0 <https://api.bitbucket.org/swagger.json>
@@ -15,7 +15,7 @@ And the response type is json format defined Bitbucket API.
 ## Install
 
 ```sh
-go get github.com/ktrysmt/go-bitbucket
+go get github.com/rcarmstrong/go-bitbucket
 ```
 
 ## Usage
@@ -24,7 +24,7 @@ go get github.com/ktrysmt/go-bitbucket
 package main
 
 import (
-        "github.com/ktrysmt/go-bitbucket" 
+        "github.com/rcarmstrong/go-bitbucket" 
         "fmt"
 )
 
@@ -69,7 +69,7 @@ It's using dep.
 
 ```sh
 go get github.com/golang/dep/...
-git clone https://github.com/ktrysmt/go-bitbucket 
+git clone https://github.com/rcarmstrong/go-bitbucket 
 cd ./go-bitbucket
 dep ensure 
 ```
@@ -99,4 +99,6 @@ make test
 
 ## Author
 
-[ktrysmt](https://github.com/ktrysmt)
+Original: [ktrysmt](https://github.com/ktrysmt)
+
+This Fork: [rcarmstrong](https://github.com/rcarmstrong)
