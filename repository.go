@@ -1,7 +1,11 @@
 package bitbucket
 
 import (
+	"bytes"
 	"encoding/json"
+	"fmt"
+	"io"
+	"mime/multipart"
 	"net/http"
 	"os"
 
@@ -110,6 +114,56 @@ func (r *Repository) RemoveDefaultReviewer(ro *RepositoryOptions, username strin
 	if err != nil {
 		return err
 	}
+
+	return nil
+}
+
+// UploadFile takes in the full path of the desired file, ie /src/main/test.txt, and uses the content of the io.Reader
+// to create the file in the specified repo. The Owner and Repo_slug fields are needed from the RepositoryOptions.
+func (r *Repository) UploadFile(ro *RepositoryOptions, filePath string, content io.Reader) error {
+	urlStr := r.c.requestUrl("/repositories/%s/%s/src", ro.Owner, ro.Repo_slug)
+	var bites bytes.Buffer
+	w := multipart.NewWriter(&bites)
+	defer w.Close()
+	client := http.DefaultClient
+	var fw io.Writer
+
+	if file, ok := content.(*os.File); ok {
+		var err error
+		if fw, err = w.CreateFormFile(filePath, file.Name()); err == nil {
+			return err
+		}
+	} else {
+		var err error
+		if fw, err = w.CreateFormField(filePath); err == nil {
+			return err
+		}
+	}
+	if _, err := io.Copy(fw, content); err != nil {
+		return err
+	}
+
+	// Now that you have a form, you can submit it to your handler.
+	req, err := http.NewRequest(http.MethodPost, urlStr, &bites)
+	if err != nil {
+		return err
+	}
+	if r.c.Auth.user != "" && r.c.Auth.password != "" {
+		req.SetBasicAuth(r.c.Auth.user, r.c.Auth.password)
+	} else if r.c.Auth.token.Valid() {
+		r.c.Auth.token.SetAuthHeader(req)
+	}
+
+	// Don't forget to set the content type, this will contain the boundary.
+	req.Header.Set("Content-Type", w.FormDataContentType())
+
+	// Submit the request
+	resp, err := client.Do(req)
+	if err != nil {
+		return err
+	}
+
+	fmt.Printf("%+v\n", resp)
 
 	return nil
 }
