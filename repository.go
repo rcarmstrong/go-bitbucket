@@ -109,7 +109,7 @@ func (r *Repository) AddDefaultReviewer(ro *RepositoryOptions, username string) 
 // and the Repo_slug are used. The username is not validated. Review for spelling mistakes.
 func (r *Repository) RemoveDefaultReviewer(ro *RepositoryOptions, username string) error {
 	urlStr := r.c.requestUrl("/repositories/%s/%s/default-reviewers/%s", ro.Owner, ro.Repo_slug, username)
-	_, err := r.c.execute(http.MethodGet, urlStr, "")
+	_, err := r.c.execute(http.MethodDelete, urlStr, "")
 	if err != nil {
 		return err
 	}
