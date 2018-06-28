@@ -110,7 +110,7 @@ func (r *Repository) AddDefaultReviewer(ro *RepositoryOptions, username string) 
 // and the Repo_slug are used. The username is not validated. Review for spelling mistakes.
 func (r *Repository) RemoveDefaultReviewer(ro *RepositoryOptions, username string) error {
 	urlStr := r.c.requestUrl("/repositories/%s/%s/default-reviewers/%s", ro.Owner, ro.Repo_slug, username)
-	_, err := r.c.execute(http.MethodDelete, urlStr, "")
+	_, err := r.c.execute(http.MethodGet, urlStr, "")
 	if err != nil {
 		return err
 	}
@@ -166,6 +166,18 @@ func (r *Repository) UploadFile(ro *RepositoryOptions, filePath string, content 
 	fmt.Printf("%+v\n", resp)
 
 	return nil
+}
+
+func (r *Repository) GetFile(ro *RepositoryOptions, filePath, hash string) ([]byte, error) {
+	if hash == "" {
+		hash = "master"
+	}
+
+	urlStr := fmt.Sprintf("%s/repositories/%s/%s/raw/%s/%s",
+		GetApiV1BaseURL(), ro.Owner, ro.Repo_slug, hash, filePath)
+	println(urlStr)
+
+	return r.c.executeRaw("GET", urlStr, "")
 }
 
 func (r *Repository) UpdatePipelineConfig(rpo *RepositoryPipelineOptions) (*Pipeline, error) {

@@ -1,6 +1,7 @@
 package bitbucket
 
 var apiBaseURL = "https://api.bitbucket.org/2.0"
+var apiV1BaseURL = "https://bitbucket.org/api/1.0"
 
 func GetApiBaseURL() string {
 	return apiBaseURL
@@ -8,6 +9,14 @@ func GetApiBaseURL() string {
 
 func SetApiBaseURL(urlStr string) {
 	apiBaseURL = urlStr
+}
+
+func GetApiV1BaseURL() string {
+	return apiV1BaseURL
+}
+
+func SetApiV1BaseURL(urlStr string) {
+	apiV1BaseURL = urlStr
 }
 
 type users interface {

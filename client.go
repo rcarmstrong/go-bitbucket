@@ -98,22 +98,7 @@ func injectClient(a *auth) *Client {
 	return c
 }
 
-func (c *Client) execute(method string, urlStr string, text string) (interface{}, error) {
-	// Use pagination if changed from default value
-	const DEC_RADIX = 10
-	if strings.Contains(urlStr, "/repositories/") {
-		if c.Pagelen != DEFAULT_PAGE_LENGHT {
-			urlObj, err := url.Parse(urlStr)
-			if err != nil {
-				return nil, err
-			}
-			q := urlObj.Query()
-			q.Set("pagelen", strconv.FormatUint(c.Pagelen, DEC_RADIX))
-			urlObj.RawQuery = q.Encode()
-			urlStr = urlObj.String()
-		}
-	}
-
+func (c *Client) executeRaw(method string, urlStr string, text string) ([]byte, error) {
 	body := strings.NewReader(text)
 	req, err := http.NewRequest(method, urlStr, body)
 	if text != "" {
@@ -151,13 +136,32 @@ func (c *Client) execute(method string, urlStr string, text string) (interface{}
 		return nil, fmt.Errorf("response body is nil")
 	}
 
-	resBodyBytes, err := ioutil.ReadAll(resp.Body)
+	return ioutil.ReadAll(resp.Body)
+}
+
+func (c *Client) execute(method string, urlStr string, text string) (interface{}, error) {
+	// Use pagination if changed from default value
+	const DEC_RADIX = 10
+	if strings.Contains(urlStr, "/repositories/") {
+		if c.Pagelen != DEFAULT_PAGE_LENGHT {
+			urlObj, err := url.Parse(urlStr)
+			if err != nil {
+				return nil, err
+			}
+			q := urlObj.Query()
+			q.Set("pagelen", strconv.FormatUint(c.Pagelen, DEC_RADIX))
+			urlObj.RawQuery = q.Encode()
+			urlStr = urlObj.String()
+		}
+	}
+
+	b, err := c.executeRaw(method, urlStr, text)
 	if err != nil {
 		return nil, err
 	}
 
 	var result interface{}
-	err = json.Unmarshal(resBodyBytes, &result)
+	err = json.Unmarshal(b, &result)
 	if err != nil {
 		return nil, err
 	}
