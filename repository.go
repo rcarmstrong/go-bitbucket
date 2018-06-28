@@ -154,9 +154,7 @@ func (r *Repository) GetFile(ro *RepositoryOptions, filePath, hash string) ([]by
 		hash = "master"
 	}
 
-	urlStr := fmt.Sprintf("%s/repositories/%s/%s/raw/%s/%s",
-		GetApiV1BaseURL(), ro.Owner, ro.Repo_slug, hash, filePath)
-	println(urlStr)
+	urlStr := r.c.requestUrl("/repositories/%s/%s/src/%s/%s", ro.Owner, ro.Repo_slug, hash, filePath)
 
 	return r.c.executeRaw("GET", urlStr, "")
 }
