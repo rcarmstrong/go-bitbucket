@@ -1,13 +1,12 @@
 package bitbucket
 
 import (
-	"bytes"
 	"encoding/json"
-	"fmt"
-	"io"
-	"mime/multipart"
 	"net/http"
+	"net/url"
 	"os"
+	"strconv"
+	"strings"
 
 	"github.com/k0kubun/pp"
 	"github.com/mitchellh/mapstructure"
@@ -118,35 +117,19 @@ func (r *Repository) RemoveDefaultReviewer(ro *RepositoryOptions, username strin
 	return nil
 }
 
-// UploadFile takes in the full path of the desired file, ie /src/main/test.txt, and uses the content of the io.Reader
-// to create the file in the specified repo. The Owner and Repo_slug fields are needed from the RepositoryOptions.
-func (r *Repository) UploadFile(ro *RepositoryOptions, filePath string, content io.Reader) error {
+// UploadFile takes in the full path of the desired file, ie /src/main/test.txt, and uses the content string to
+// create the file in the specified repo. The Owner and Repo_slug fields are needed from the RepositoryOptions.
+func (r *Repository) UploadFile(ro *RepositoryOptions, branch, filePath, content string) (*http.Response, error) {
 	urlStr := r.c.requestUrl("/repositories/%s/%s/src", ro.Owner, ro.Repo_slug)
-	var bites bytes.Buffer
-	w := multipart.NewWriter(&bites)
-	defer w.Close()
 	client := http.DefaultClient
-	var fw io.Writer
 
-	if file, ok := content.(*os.File); ok {
-		var err error
-		if fw, err = w.CreateFormFile(filePath, file.Name()); err == nil {
-			return err
-		}
-	} else {
-		var err error
-		if fw, err = w.CreateFormField(filePath); err == nil {
-			return err
-		}
-	}
-	if _, err := io.Copy(fw, content); err != nil {
-		return err
-	}
+	data := url.Values{}
+	data.Set(filePath, content)
+	data.Add("branch", branch)
 
-	// Now that you have a form, you can submit it to your handler.
-	req, err := http.NewRequest(http.MethodPost, urlStr, &bites)
+	req, err := http.NewRequest(http.MethodPost, urlStr, strings.NewReader(data.Encode()))
 	if err != nil {
-		return err
+		return nil, err
 	}
 	if r.c.Auth.user != "" && r.c.Auth.password != "" {
 		req.SetBasicAuth(r.c.Auth.user, r.c.Auth.password)
@@ -154,18 +137,16 @@ func (r *Repository) UploadFile(ro *RepositoryOptions, filePath string, content 
 		r.c.Auth.token.SetAuthHeader(req)
 	}
 
-	// Don't forget to set the content type, this will contain the boundary.
-	req.Header.Set("Content-Type", w.FormDataContentType())
+	req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
+	req.Header.Add("Content-Length", strconv.Itoa(len(data.Encode())))
 
 	// Submit the request
 	resp, err := client.Do(req)
 	if err != nil {
-		return err
+		return resp, err
 	}
 
-	fmt.Printf("%+v\n", resp)
-
-	return nil
+	return resp, nil
 }
 
 func (r *Repository) GetFile(ro *RepositoryOptions, filePath, hash string) ([]byte, error) {
